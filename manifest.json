@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "MM Serp Crawler",
-  "version": "1.0.0",
+  "name": "MM Link Domain Inspector",
+  "version": "0.0.1",
   "description": "Grab URLs dari hasil pencarian Google SERP berdasarkan domain yang ditambahkan.",
   "permissions": [
     "activeTab",
