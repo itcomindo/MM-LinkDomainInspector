@@ -1,0 +1,32 @@
+/**
+ * MM Serp Crawler - content.css
+ * Injected into Google SERP pages and regular HTML pages.
+ */
+
+/* Highlight card on Google SERP — pink glow on the left + subtle background */
+.mm-serp-hl {
+  background-color: rgba(255, 105, 180, 0.13) !important;
+  border-radius: 8px !important;
+  box-shadow: -4px 0 0 0 #ff69b4 !important;
+  transition:
+    background-color 0.25s ease,
+    box-shadow 0.25s ease !important;
+  position: relative;
+}
+
+/* Highlight links on regular HTML pages */
+.mm-page-hl {
+  background-color: rgba(255, 105, 180, 0.28) !important;
+  outline: 2px solid #ff69b4 !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+  transition:
+    background-color 0.2s ease,
+    outline 0.2s ease !important;
+}
+
+.mm-page-hl::after {
+  content: " 🔗";
+  font-size: 0.75em;
+  vertical-align: middle;
+}
