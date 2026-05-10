@@ -53,6 +53,48 @@ header h1 {
   border-bottom: none;
 }
 
+/* ── Exclude section ── */
+.section-exclude {
+  padding: 12px 16px;
+  border-bottom: 1px solid #e8eaed;
+  background: #fff8f0;
+}
+
+.exclude-section-header {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 2px;
+}
+
+.exclude-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #e37400;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.exclude-section-desc {
+  font-size: 11px;
+  color: #8a6000;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.exclude-title {
+  color: #e37400;
+}
+
+.exclude-domain-cell {
+  color: #e37400 !important;
+}
+
+.btn-warning {
+  background: #f29900;
+  color: #fff;
+}
+
 /* ── Input row ── */
 .input-row {
   display: flex;

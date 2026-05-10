@@ -7,8 +7,10 @@
 
 const STORAGE_KEY = 'mm_serp_domains';
 const STORAGE_KEY_HL = 'mm_serp_highlight_enabled';
+const STORAGE_KEY_EX = 'mm_serp_exclude_domains';
 
 let domains = [];
+let excludeDomains = [];
 let editingIdx = -1;
 
 // ── DOM refs ────────────────────────────────────────────────────────────────
@@ -26,16 +28,30 @@ const resultText = document.getElementById('resultText');
 const copyBtn = document.getElementById('copyBtn');
 const highlightCheckbox = document.getElementById('highlightCheckbox');
 
+// Exclude domain DOM refs
+const excludeInput = document.getElementById('excludeInput');
+const addExcludeBtn = document.getElementById('addExcludeBtn');
+const clearAllExcludeBtn = document.getElementById('clearAllExcludeBtn');
+const excludeTable = document.getElementById('excludeTable');
+const excludeTableBody = document.getElementById('excludeTableBody');
+const excludeEmptyState = document.getElementById('excludeEmptyState');
+
 // ── Storage ─────────────────────────────────────────────────────────────────
 async function loadDomains() {
-    const data = await chrome.storage.local.get([STORAGE_KEY, STORAGE_KEY_HL]);
+    const data = await chrome.storage.local.get([STORAGE_KEY, STORAGE_KEY_HL, STORAGE_KEY_EX]);
     domains = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
+    excludeDomains = Array.isArray(data[STORAGE_KEY_EX]) ? data[STORAGE_KEY_EX] : [];
     highlightCheckbox.checked = !!data[STORAGE_KEY_HL];
     renderTable();
+    renderExcludeTable();
 }
 
 async function saveDomains() {
     await chrome.storage.local.set({ [STORAGE_KEY]: domains });
+}
+
+async function saveExcludeDomains() {
+    await chrome.storage.local.set({ [STORAGE_KEY_EX]: excludeDomains });
 }
 
 // ── Validation & Cleanup ────────────────────────────────────────────────────
@@ -190,6 +206,73 @@ clearAllBtn.addEventListener('click', async () => {
     await saveDomains();
     renderTable();
     showStatus('Semua domain telah dihapus.', 'info');
+});
+
+// ── Render exclude table ──────────────────────────────────────────────────────
+function renderExcludeTable() {
+    excludeTableBody.innerHTML = '';
+    const empty = excludeDomains.length === 0;
+    excludeTable.style.display = empty ? 'none' : 'table';
+    excludeEmptyState.style.display = empty ? 'block' : 'none';
+    clearAllExcludeBtn.disabled = empty;
+
+    excludeDomains.forEach((domain, i) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+        <td>${i + 1}</td>
+        <td class="domain-cell exclude-domain-cell">${escapeHtml(domain)}</td>
+        <td class="actions">
+          <button class="btn btn-xs btn-danger" data-ex-action="delete" data-i="${i}">Hapus</button>
+        </td>`;
+        excludeTableBody.appendChild(tr);
+    });
+}
+
+// ── Exclude table events ──────────────────────────────────────────────────────
+excludeTableBody.addEventListener('click', async e => {
+    const btn = e.target.closest('[data-ex-action]');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.i, 10);
+    if (btn.dataset.exAction === 'delete') {
+        excludeDomains.splice(idx, 1);
+        await saveExcludeDomains();
+        renderExcludeTable();
+        showStatus('Domain exclude dihapus.', 'info');
+    }
+});
+
+// ── Add exclude domain ────────────────────────────────────────────────────────
+async function addExcludeDomain() {
+    const domain = cleanDomain(excludeInput.value);
+    if (!domain) return;
+
+    if (!isValidDomain(domain)) {
+        showStatus('Format domain tidak valid. Contoh: aaa.com', 'error');
+        return;
+    }
+
+    if (excludeDomains.includes(domain)) {
+        showStatus(`Domain "${domain}" sudah ada di daftar exclude.`, 'error');
+        return;
+    }
+
+    excludeDomains.push(domain);
+    await saveExcludeDomains();
+    excludeInput.value = '';
+    renderExcludeTable();
+    showStatus(`"${domain}" ditambahkan ke exclude.`, 'success');
+}
+
+addExcludeBtn.addEventListener('click', addExcludeDomain);
+excludeInput.addEventListener('keydown', e => { if (e.key === 'Enter') addExcludeDomain(); });
+
+// ── Clear all exclude ─────────────────────────────────────────────────────────
+clearAllExcludeBtn.addEventListener('click', async () => {
+    if (!confirm('Hapus semua domain dari daftar exclude?')) return;
+    excludeDomains = [];
+    await saveExcludeDomains();
+    renderExcludeTable();
+    showStatus('Semua domain exclude telah dihapus.', 'info');
 });
 
 // ── Grab URLs ─────────────────────────────────────────────────────────────────

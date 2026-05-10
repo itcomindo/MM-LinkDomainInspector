@@ -11,6 +11,7 @@ const MM_CLASS = 'mm-serp-hl';
 const MM_PAGE_CLASS = 'mm-page-hl';
 const KEY_DOMAINS = 'mm_serp_domains';
 const KEY_HL = 'mm_serp_highlight_enabled';
+const KEY_EXCLUDE = 'mm_serp_exclude_domains';
 
 const isGoogleSerp = location.hostname === 'www.google.com' && location.pathname.startsWith('/search');
 
@@ -120,15 +121,23 @@ function removePageHighlights() {
 
 // ── Read storage and (re)apply ────────────────────────────────────────────────
 function refresh() {
-    chrome.storage.local.get([KEY_DOMAINS, KEY_HL], result => {
+    chrome.storage.local.get([KEY_DOMAINS, KEY_HL, KEY_EXCLUDE], result => {
         const domains = result[KEY_DOMAINS] || [];
         const enabled = !!result[KEY_HL];
+        const excludeDomains = result[KEY_EXCLUDE] || [];
+
+        // If the current page's hostname is in the exclude list, remove all highlights and stop.
+        const currentHost = location.hostname.toLowerCase().replace(/^www\./, '');
+        const isPageExcluded = excludeDomains.some(d => {
+            const clean = d.toLowerCase().replace(/^www\./, '');
+            return currentHost === clean || currentHost.endsWith('.' + clean);
+        });
 
         if (isGoogleSerp) {
-            if (enabled) applyHighlights(domains);
+            if (enabled && !isPageExcluded) applyHighlights(domains);
             else removeHighlights();
         } else {
-            if (enabled) applyPageHighlights(domains);
+            if (enabled && !isPageExcluded) applyPageHighlights(domains);
             else removePageHighlights();
         }
     });

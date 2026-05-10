@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MM Serp Crawler</title>
+    <title>MM Link Domain Inspector</title>
     <link rel="stylesheet" href="popup.css" />
 </head>
 
@@ -14,7 +14,7 @@
         <header>
             <div class="header-inner">
                 <span class="logo">⚡</span>
-                <h1>MM Serp Crawler</h1>
+                <h1>MM Link Domain Inspector</h1>
             </div>
         </header>
 
@@ -48,6 +48,34 @@
                     </tr>
                 </thead>
                 <tbody id="domainTableBody"></tbody>
+            </table>
+        </section>
+
+        <section class="section-exclude">
+            <div class="exclude-section-header">
+                <span class="exclude-section-title">🚫 Exclude Page Domain</span>
+                <span class="exclude-section-desc">Link target tidak akan di-highlight jika ditemukan di halaman domain
+                    ini.</span>
+            </div>
+            <div class="input-row" style="margin-top:8px">
+                <input type="text" id="excludeInput" placeholder="Domain halaman dikecualikan, misal: aaa.com"
+                    autocomplete="off" />
+                <button id="addExcludeBtn" class="btn btn-warning">Add</button>
+            </div>
+            <div class="list-header" style="margin-top:8px">
+                <span class="list-title exclude-title">Daftar Exclude</span>
+                <button id="clearAllExcludeBtn" class="btn btn-danger btn-sm" disabled>Hapus Semua</button>
+            </div>
+            <div id="excludeEmptyState" class="empty-state">Belum ada domain dikecualikan.</div>
+            <table id="excludeTable" style="display:none">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Domain</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="excludeTableBody"></tbody>
             </table>
         </section>
 
