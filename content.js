@@ -9,6 +9,7 @@
 
 const MM_CLASS = 'mm-serp-hl';
 const MM_PAGE_CLASS = 'mm-page-hl';
+const MM_PAGE_CLASS_NOFOLLOW = 'mm-page-hl-nofollow';
 const KEY_DOMAINS = 'mm_serp_domains';
 const KEY_HL = 'mm_serp_highlight_enabled';
 const KEY_EXCLUDE = 'mm_serp_exclude_domains';
@@ -88,9 +89,18 @@ function removeHighlights() {
     document.querySelectorAll('.' + MM_CLASS).forEach(el => el.classList.remove(MM_CLASS));
 }
 
+// ── Detect nofollow on an anchor ─────────────────────────────────────────────
+function isNofollow(anchor) {
+    const rel = (anchor.getAttribute('rel') || '').toLowerCase().split(/\s+/);
+    return rel.includes('nofollow');
+}
+
 // ── Page: Apply highlights on matching <a> links ──────────────────────────────
 function applyPageHighlights(domains) {
-    document.querySelectorAll('.' + MM_PAGE_CLASS).forEach(el => el.classList.remove(MM_PAGE_CLASS));
+    document.querySelectorAll('.' + MM_PAGE_CLASS + ', .' + MM_PAGE_CLASS_NOFOLLOW).forEach(el => {
+        el.classList.remove(MM_PAGE_CLASS);
+        el.classList.remove(MM_PAGE_CLASS_NOFOLLOW);
+    });
 
     if (!domains || domains.length === 0) return;
 
@@ -108,7 +118,11 @@ function applyPageHighlights(domains) {
         try {
             const url = new URL(a.href);
             if (hostMatchesDomains(url.hostname, filteredDomains)) {
-                a.classList.add(MM_PAGE_CLASS);
+                if (isNofollow(a)) {
+                    a.classList.add(MM_PAGE_CLASS_NOFOLLOW);
+                } else {
+                    a.classList.add(MM_PAGE_CLASS);
+                }
             }
         } catch { /* skip malformed href */ }
     });
@@ -116,7 +130,10 @@ function applyPageHighlights(domains) {
 
 // ── Page: Remove link highlights ──────────────────────────────────────────────
 function removePageHighlights() {
-    document.querySelectorAll('.' + MM_PAGE_CLASS).forEach(el => el.classList.remove(MM_PAGE_CLASS));
+    document.querySelectorAll('.' + MM_PAGE_CLASS + ', .' + MM_PAGE_CLASS_NOFOLLOW).forEach(el => {
+        el.classList.remove(MM_PAGE_CLASS);
+        el.classList.remove(MM_PAGE_CLASS_NOFOLLOW);
+    });
 }
 
 // ── Read storage and (re)apply ────────────────────────────────────────────────
