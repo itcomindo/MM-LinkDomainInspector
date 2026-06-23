@@ -47,3 +47,37 @@
   font-size: 0.75em;
   vertical-align: middle;
 }
+
+/* ── External links (dofollow) — blue ── */
+.mm-ext-link-hl {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  outline: 2px solid #3b82f6 !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+  transition:
+    background-color 0.2s ease,
+    outline 0.2s ease !important;
+}
+
+.mm-ext-link-hl::after {
+  content: " 🔗";
+  font-size: 0.75em;
+  vertical-align: middle;
+}
+
+/* ── External links (nofollow) — amber ── */
+.mm-ext-link-hl-nf {
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  outline: 2px solid #f59e0b !important;
+  border-radius: 3px !important;
+  padding: 1px 4px !important;
+  transition:
+    background-color 0.2s ease,
+    outline 0.2s ease !important;
+}
+
+.mm-ext-link-hl-nf::after {
+  content: " 🔗🚫";
+  font-size: 0.75em;
+  vertical-align: middle;
+}

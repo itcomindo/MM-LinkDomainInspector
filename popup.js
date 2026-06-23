@@ -8,6 +8,7 @@
 const STORAGE_KEY = 'mm_serp_domains';
 const STORAGE_KEY_HL = 'mm_serp_highlight_enabled';
 const STORAGE_KEY_EX = 'mm_serp_exclude_domains';
+const STORAGE_KEY_EXT = 'mm_ext_link_enabled';
 
 let domains = [];
 let excludeDomains = [];
@@ -27,6 +28,8 @@ const resultCount = document.getElementById('resultCount');
 const resultText = document.getElementById('resultText');
 const copyBtn = document.getElementById('copyBtn');
 const highlightCheckbox = document.getElementById('highlightCheckbox');
+const extLinkCheckbox = document.getElementById('extLinkCheckbox');
+const extLinkCount = document.getElementById('extLinkCount');
 
 // Exclude domain DOM refs
 const excludeInput = document.getElementById('excludeInput');
@@ -38,12 +41,14 @@ const excludeEmptyState = document.getElementById('excludeEmptyState');
 
 // ── Storage ─────────────────────────────────────────────────────────────────
 async function loadDomains() {
-    const data = await chrome.storage.local.get([STORAGE_KEY, STORAGE_KEY_HL, STORAGE_KEY_EX]);
+    const data = await chrome.storage.local.get([STORAGE_KEY, STORAGE_KEY_HL, STORAGE_KEY_EX, STORAGE_KEY_EXT]);
     domains = Array.isArray(data[STORAGE_KEY]) ? data[STORAGE_KEY] : [];
     excludeDomains = Array.isArray(data[STORAGE_KEY_EX]) ? data[STORAGE_KEY_EX] : [];
     highlightCheckbox.checked = !!data[STORAGE_KEY_HL];
+    extLinkCheckbox.checked = !!data[STORAGE_KEY_EXT];
     renderTable();
     renderExcludeTable();
+    if (extLinkCheckbox.checked) setTimeout(refreshExtLinkCount, 400);
 }
 
 async function saveDomains() {
@@ -430,6 +435,38 @@ function escapeHtml(str) {
 highlightCheckbox.addEventListener('change', async () => {
     await chrome.storage.local.set({ [STORAGE_KEY_HL]: highlightCheckbox.checked });
 });
+
+// ── External link checker toggle ─────────────────────────────────────────────
+extLinkCheckbox.addEventListener('change', async () => {
+    await chrome.storage.local.set({ [STORAGE_KEY_EXT]: extLinkCheckbox.checked });
+    if (extLinkCheckbox.checked) {
+        setTimeout(refreshExtLinkCount, 400);
+    } else {
+        extLinkCount.textContent = '';
+    }
+});
+
+// ── Refresh external link count from active tab ───────────────────────────────
+async function refreshExtLinkCount() {
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.id) return;
+        const results = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: () => ({
+                df: document.querySelectorAll('.mm-ext-link-hl').length,
+                nf: document.querySelectorAll('.mm-ext-link-hl-nf').length,
+            }),
+        });
+        const { df, nf } = results?.[0]?.result ?? { df: 0, nf: 0 };
+        const total = df + nf;
+        extLinkCount.textContent = total > 0
+            ? `${total} link (${df} dofollow · ${nf} nofollow)`
+            : 'tidak ada external link';
+    } catch {
+        extLinkCount.textContent = '';
+    }
+}
 
 // ── Init ──────────────────────────────────────────────────────────────────────
 loadDomains();

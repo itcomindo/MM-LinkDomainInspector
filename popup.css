@@ -191,6 +191,31 @@ input[type="text"]:focus {
   background: #fafafa;
 }
 
+/* ── External link checker section ── */
+.section-extlink {
+  padding: 9px 16px;
+  border-bottom: 1px solid #e8eaed;
+  background: #f0f7ff;
+}
+
+.section-extlink .hl-toggle input:checked ~ .hl-slider {
+  background: #3b82f6;
+}
+
+.extlink-hint {
+  font-size: 11px;
+  color: #5f6368;
+  margin-top: 5px;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.extlink-count {
+  font-weight: 600;
+  color: #3b82f6;
+  font-style: normal;
+}
+
 .hl-toggle {
   display: flex;
   align-items: center;

@@ -2,97 +2,96 @@
 <html lang="id">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>MM Link Domain Inspector</title>
-    <link rel="stylesheet" href="popup.css" />
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>MM Link Domain Inspector</title>
+	<link rel="stylesheet" href="popup.css" />
 </head>
 
 <body>
-    <div class="container">
-
-        <header>
-            <div class="header-inner">
-                <span class="logo">⚡</span>
-                <h1>MM Link Domain Inspector</h1>
-            </div>
-        </header>
-
-        <section class="section-add">
-            <div class="input-row">
-                <input type="text" id="domainInput" placeholder="Masukkan domain, misal: codef.id" autocomplete="off" />
-                <button id="addBtn" class="btn btn-primary">Add</button>
-            </div>
-        </section>
-
-        <section class="section-settings">
-            <label class="hl-toggle" for="highlightCheckbox">
-                <input type="checkbox" id="highlightCheckbox" />
-                <span class="hl-slider"></span>
-                <span class="hl-label-text">Highlight matched domain di halaman ini</span>
-            </label>
-        </section>
-
-        <section class="section-list">
-            <div class="list-header">
-                <span class="list-title">Daftar Domain</span>
-                <button id="clearAllBtn" class="btn btn-danger btn-sm" disabled>Hapus Semua</button>
-            </div>
-            <div id="emptyState" class="empty-state">Belum ada domain ditambahkan.</div>
-            <table id="domainTable" style="display:none">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Domain</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="domainTableBody"></tbody>
-            </table>
-        </section>
-
-        <section class="section-exclude">
-            <div class="exclude-section-header">
-                <span class="exclude-section-title">🚫 Exclude Page Domain</span>
-                <span class="exclude-section-desc">Link target tidak akan di-highlight jika ditemukan di halaman domain
-                    ini.</span>
-            </div>
-            <div class="input-row" style="margin-top:8px">
-                <input type="text" id="excludeInput" placeholder="Domain halaman dikecualikan, misal: aaa.com"
-                    autocomplete="off" />
-                <button id="addExcludeBtn" class="btn btn-warning">Add</button>
-            </div>
-            <div class="list-header" style="margin-top:8px">
-                <span class="list-title exclude-title">Daftar Exclude</span>
-                <button id="clearAllExcludeBtn" class="btn btn-danger btn-sm" disabled>Hapus Semua</button>
-            </div>
-            <div id="excludeEmptyState" class="empty-state">Belum ada domain dikecualikan.</div>
-            <table id="excludeTable" style="display:none">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Domain</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody id="excludeTableBody"></tbody>
-            </table>
-        </section>
-
-        <section class="section-grab">
-            <button id="grabBtn" class="btn btn-success btn-full">▶ Grab URLs dari Halaman</button>
-            <div id="status" class="status" style="display:none"></div>
-            <div id="resultBox" class="result-box" style="display:none">
-                <div class="result-header">
-                    <span id="resultCount" class="result-count"></span>
-                    <button id="copyBtn" class="btn btn-sm btn-outline">⎘ Copy Ulang</button>
-                </div>
-                <textarea id="resultText" readonly spellcheck="false"></textarea>
-            </div>
-        </section>
-
-    </div>
-    <script src="popup.js"></script>
+	<div class="container">
+		<header>
+			<div class="header-inner">
+				<span class="logo">⚡</span>
+				<h1>MM Link Domain Inspector</h1>
+			</div>
+		</header>
+		<section class="section-add">
+			<div class="input-row">
+				<input type="text" id="domainInput" placeholder="Masukkan domain, misal: codef.id" autocomplete="off" />
+				<button id="addBtn" class="btn btn-primary">Add</button>
+			</div>
+		</section>
+		<section class="section-settings">
+			<label class="hl-toggle" for="highlightCheckbox">
+				<input type="checkbox" id="highlightCheckbox" />
+				<span class="hl-slider"></span>
+				<span class="hl-label-text">Highlight matched domain di halaman ini</span>
+			</label>
+		</section>
+		<section class="section-extlink">
+			<label class="hl-toggle" for="extLinkCheckbox">
+				<input type="checkbox" id="extLinkCheckbox" />
+				<span class="hl-slider hl-slider-ext"></span>
+				<span class="hl-label-text">🔗 Check external links di halaman ini</span>
+			</label>
+			<div class="extlink-hint">Auto-deteksi link eksternal · CDN &amp; analytics diabaikan · <span id="extLinkCount" class="extlink-count"></span></div>
+		</section>
+		<section class="section-list">
+			<div class="list-header">
+				<span class="list-title">Daftar Domain</span>
+				<button id="clearAllBtn" class="btn btn-danger btn-sm" disabled>Hapus Semua</button>
+			</div>
+			<div id="emptyState" class="empty-state">Belum ada domain ditambahkan.</div>
+			<table id="domainTable" style="display:none">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Domain</th>
+						<th>Aksi</th>
+					</tr>
+				</thead>
+				<tbody id="domainTableBody"></tbody>
+			</table>
+		</section>
+		<section class="section-exclude">
+			<div class="exclude-section-header">
+				<span class="exclude-section-title">🚫 Exclude Page Domain</span>
+				<span class="exclude-section-desc">Link target tidak akan di-highlight jika ditemukan di halaman domain ini.</span>
+			</div>
+			<div class="input-row" style="margin-top:8px">
+				<input type="text" id="excludeInput" placeholder="Domain halaman dikecualikan, misal: aaa.com" autocomplete="off" />
+				<button id="addExcludeBtn" class="btn btn-warning">Add</button>
+			</div>
+			<div class="list-header" style="margin-top:8px">
+				<span class="list-title exclude-title">Daftar Exclude</span>
+				<button id="clearAllExcludeBtn" class="btn btn-danger btn-sm" disabled>Hapus Semua</button>
+			</div>
+			<div id="excludeEmptyState" class="empty-state">Belum ada domain dikecualikan.</div>
+			<table id="excludeTable" style="display:none">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Domain</th>
+						<th>Aksi</th>
+					</tr>
+				</thead>
+				<tbody id="excludeTableBody"></tbody>
+			</table>
+		</section>
+		<section class="section-grab">
+			<button id="grabBtn" class="btn btn-success btn-full">▶ Grab URLs dari Halaman</button>
+			<div id="status" class="status" style="display:none"></div>
+			<div id="resultBox" class="result-box" style="display:none">
+				<div class="result-header">
+					<span id="resultCount" class="result-count"></span>
+					<button id="copyBtn" class="btn btn-sm btn-outline">⎘ Copy Ulang</button>
+				</div>
+				<textarea id="resultText" readonly spellcheck="false"></textarea>
+			</div>
+		</section>
+	</div>
+	<script src="popup.js"></script>
 </body>
 
 </html>
