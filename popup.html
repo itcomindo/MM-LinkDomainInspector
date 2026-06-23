@@ -23,19 +23,22 @@
 			</div>
 		</section>
 		<section class="section-settings">
-			<label class="hl-toggle" for="highlightCheckbox">
-				<input type="checkbox" id="highlightCheckbox" />
-				<span class="hl-slider"></span>
-				<span class="hl-label-text">Highlight matched domain di halaman ini</span>
-			</label>
+			<div class="hl-row">
+				<label class="hl-toggle" for="highlightCheckbox">
+					<input type="checkbox" id="highlightCheckbox" />
+					<span class="hl-slider"></span>
+					<span class="hl-label-text">Highlight matched domain di halaman ini</span>
+				</label>
+				<button type="button" id="findBtn" class="btn-find" title="Scroll ke link berikutnya yang cocok">Find</button>
+			</div>
 		</section>
 		<section class="section-extlink">
 			<label class="hl-toggle" for="extLinkCheckbox">
 				<input type="checkbox" id="extLinkCheckbox" />
 				<span class="hl-slider hl-slider-ext"></span>
-				<span class="hl-label-text">🔗 Check external links di halaman ini</span>
+				<span class="hl-label-text">Enable do/nofollow flag</span>
 			</label>
-			<div class="extlink-hint">Auto-deteksi link eksternal · CDN &amp; analytics diabaikan · <span id="extLinkCount" class="extlink-count"></span></div>
+			<div class="extlink-hint">Highlight link eksternal: <span class="extlink-do">hijau = dofollow</span> · <span class="extlink-nf">merah = nofollow</span> · CDN &amp; analytics diabaikan · <span id="extLinkCount" class="extlink-count"></span></div>
 		</section>
 		<section class="section-list">
 			<div class="list-header">

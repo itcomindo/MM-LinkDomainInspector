@@ -12,6 +12,7 @@ const MM_PAGE_CLASS = 'mm-page-hl';
 const MM_PAGE_CLASS_NOFOLLOW = 'mm-page-hl-nofollow';
 const MM_EXT_CLASS = 'mm-ext-link-hl';
 const MM_EXT_CLASS_NF = 'mm-ext-link-hl-nf';
+const MM_FIND_CLASS = 'mm-find-active';
 const KEY_DOMAINS = 'mm_serp_domains';
 const KEY_HL = 'mm_serp_highlight_enabled';
 const KEY_EXCLUDE = 'mm_serp_exclude_domains';
@@ -244,6 +245,88 @@ function removePageHighlights() {
     });
 }
 
+// ── Find: collect matched link elements ───────────────────────────────────────
+function collectMatchedLinks(domains, excludeDomains) {
+    if (!domains || domains.length === 0) return [];
+
+    const currentHost = location.hostname.toLowerCase().replace(/^www\./, '');
+    const isPageExcluded = excludeDomains.some(d => {
+        const clean = d.toLowerCase().replace(/^www\./, '');
+        return currentHost === clean || currentHost.endsWith('.' + clean);
+    });
+    if (isPageExcluded) return [];
+
+    const links = [];
+
+    if (isGoogleSerp) {
+        const seen = new WeakSet();
+        document.querySelectorAll('#rso h3, #search h3').forEach(h3 => {
+            const a = h3.closest('a') || h3.parentElement?.closest('a');
+            if (!a || seen.has(a)) return;
+
+            const href = resolveHref(a.href);
+            if (!href) return;
+
+            try {
+                const hostname = new URL(href).hostname;
+                if (!hostMatchesDomains(hostname, domains)) return;
+
+                const card = getResultCard(a);
+                if (!card || seen.has(card)) return;
+
+                seen.add(a);
+                seen.add(card);
+                links.push(a);
+            } catch { /* skip malformed URLs */ }
+        });
+    } else {
+        const filteredDomains = domains.filter(d => {
+            const clean = d.toLowerCase().replace(/^www\./, '');
+            return currentHost !== clean && !currentHost.endsWith('.' + clean);
+        });
+
+        document.querySelectorAll('a[href]').forEach(a => {
+            try {
+                const url = new URL(a.href);
+                if (hostMatchesDomains(url.hostname, filteredDomains)) {
+                    links.push(a);
+                }
+            } catch { /* skip malformed href */ }
+        });
+    }
+
+    return links;
+}
+
+let findIndex = -1;
+
+function findNextMatched(callback) {
+    chrome.storage.local.get([KEY_DOMAINS, KEY_EXCLUDE], result => {
+        const domains = result[KEY_DOMAINS] || [];
+        const excludeDomains = result[KEY_EXCLUDE] || [];
+        const links = collectMatchedLinks(domains, excludeDomains);
+
+        document.querySelectorAll('.' + MM_FIND_CLASS).forEach(el => el.classList.remove(MM_FIND_CLASS));
+
+        if (links.length === 0) {
+            findIndex = -1;
+            callback({ count: 0, index: -1 });
+            return;
+        }
+
+        findIndex = (findIndex + 1) % links.length;
+        const target = links[findIndex];
+
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.classList.add(MM_FIND_CLASS);
+        target.focus({ preventScroll: true });
+
+        setTimeout(() => target.classList.remove(MM_FIND_CLASS), 2000);
+
+        callback({ count: links.length, index: findIndex });
+    });
+}
+
 // ── Read storage and (re)apply ────────────────────────────────────────────────
 function refresh() {
     chrome.storage.local.get([KEY_DOMAINS, KEY_HL, KEY_EXCLUDE, KEY_EXT_HL], result => {
@@ -277,8 +360,16 @@ function refresh() {
 function init() {
     refresh();
 
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+        if (message?.type !== 'MM_FIND_NEXT') return;
+
+        findNextMatched(result => sendResponse(result));
+        return true;
+    });
+
     chrome.storage.onChanged.addListener((changes, area) => {
         if (area !== 'local') return;
+        if (changes[KEY_DOMAINS] || changes[KEY_EXCLUDE]) findIndex = -1;
         refresh();
     });
 

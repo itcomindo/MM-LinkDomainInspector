@@ -191,6 +191,41 @@ input[type="text"]:focus {
   background: #fafafa;
 }
 
+.hl-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.hl-row .hl-toggle {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-find {
+  flex-shrink: 0;
+  padding: 3px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  color: #1a73e8;
+  background: #e8f0fe;
+  border: 1px solid #bed0f8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.btn-find:hover {
+  background: #d2e3fc;
+  border-color: #8ab4f8;
+}
+
+.btn-find:active {
+  background: #c6dafc;
+}
+
 /* ── External link checker section ── */
 .section-extlink {
   padding: 9px 16px;
@@ -199,7 +234,7 @@ input[type="text"]:focus {
 }
 
 .section-extlink .hl-toggle input:checked ~ .hl-slider {
-  background: #3b82f6;
+  background: #22c55e;
 }
 
 .extlink-hint {
@@ -210,9 +245,21 @@ input[type="text"]:focus {
   line-height: 1.4;
 }
 
+.extlink-do {
+  color: #16a34a;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.extlink-nf {
+  color: #dc2626;
+  font-weight: 600;
+  font-style: normal;
+}
+
 .extlink-count {
   font-weight: 600;
-  color: #3b82f6;
+  color: #5f6368;
   font-style: normal;
 }
 

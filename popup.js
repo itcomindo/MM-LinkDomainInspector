@@ -28,6 +28,7 @@ const resultCount = document.getElementById('resultCount');
 const resultText = document.getElementById('resultText');
 const copyBtn = document.getElementById('copyBtn');
 const highlightCheckbox = document.getElementById('highlightCheckbox');
+const findBtn = document.getElementById('findBtn');
 const extLinkCheckbox = document.getElementById('extLinkCheckbox');
 const extLinkCount = document.getElementById('extLinkCount');
 
@@ -434,6 +435,33 @@ function escapeHtml(str) {
 // ── Highlight toggle ─────────────────────────────────────────────────────────
 highlightCheckbox.addEventListener('change', async () => {
     await chrome.storage.local.set({ [STORAGE_KEY_HL]: highlightCheckbox.checked });
+});
+
+// ── Find next matched link ────────────────────────────────────────────────────
+findBtn.addEventListener('click', async () => {
+    if (domains.length === 0) {
+        showStatus('Tambahkan domain terlebih dahulu.', 'error');
+        return;
+    }
+
+    try {
+        const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+        if (!tab?.id) {
+            showStatus('Tidak dapat membaca halaman aktif.', 'error');
+            return;
+        }
+
+        const result = await chrome.tabs.sendMessage(tab.id, { type: 'MM_FIND_NEXT' });
+
+        if (!result?.count) {
+            showStatus('Tidak ada link yang cocok di halaman ini.', 'error');
+            return;
+        }
+
+        showStatus(`Link ${result.index + 1} dari ${result.count}`, 'success');
+    } catch {
+        showStatus('Gagal menemukan link. Muat ulang halaman lalu coba lagi.', 'error');
+    }
 });
 
 // ── External link checker toggle ─────────────────────────────────────────────
